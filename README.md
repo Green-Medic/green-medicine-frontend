@@ -1,4 +1,4 @@
-# green_medicine
+# green-medicine
 
 ## Project setup
 ```
