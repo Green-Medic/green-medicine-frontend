@@ -1,18 +1,17 @@
 
 <template>
+  <div>
+    <div class="center">
+      <span class="p-input-icon-right">
+        <i class="pi pi-search"/>
+        <InputText v-on:keyup.enter="getMedicineList" type="text" class="p-inputtext-lg" v-model="search_value" placeholder="Search" />
+      </span>
+    </div>
 
-  <div class="center">
-    <span class="p-input-icon-left">
-      <i class="pi pi-search"/>
-      <InputText type="text" class="p-inputtext-lg" v-model="search_value" placeholder="Search" />
-    </span>
+    <DataTable :value="MedicineList">
+      <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field"></Column>
+    </DataTable>
   </div>
-
-
-  <DataTable :value="MedicineList">
-    <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field"></Column>
-  </DataTable>
-
 </template>
 
 
@@ -24,7 +23,7 @@ export default {
   setup() {
     const SERVER_BASE = 'https://api.mocki.io/v1';
     const MedicineList = ref([]);
-    let medicineListLength = 0;
+    const search_value = ref("");
     let columns = [
       {field: "sl", header: "SN"},
       {field: "brand_name", header: "Brand"},
@@ -37,22 +36,23 @@ export default {
       {field: "use_for", header: "Use for"},
     ]
 
-    async function getMedicineList(parameters="") {
-      const response = await fetch(`${SERVER_BASE}/738303ce/${parameters}`, {
+    async function getMedicineList(parameter="") {
+      parameter = search_value.value
+      const response = await fetch(`${SERVER_BASE}/738303ce/${parameter}`, {
       headers : { 
         'Content-Type': 'application/json',
         'Accept': 'application/json'
        }
       });
       MedicineList.value = await response.json();
-      medicineListLength = MedicineList.value.length;
     }
-    getMedicineList();
 
+    getMedicineList();
     return {
+      getMedicineList,
       MedicineList,
-      medicineListLength,
-      columns
+      columns,
+      search_value,
     }
   }
 }
@@ -64,7 +64,7 @@ export default {
 <style>
   .center {
     margin: auto;
-    width: 20%;
-    padding: 10px;
+    width: 30%;
+    padding: 20px;
   }
 </style>
