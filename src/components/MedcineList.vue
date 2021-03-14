@@ -1,10 +1,17 @@
 
 <template>
-  <h1>Hello Medicine</h1>
 
-<DataTable :value="MedicineList">
-      <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field"></Column>
-</DataTable>
+  <div class="center">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"/>
+      <InputText type="text" class="p-inputtext-lg" v-model="search_value" placeholder="Search" />
+    </span>
+  </div>
+
+
+  <DataTable :value="MedicineList">
+    <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field"></Column>
+  </DataTable>
 
 </template>
 
@@ -55,19 +62,9 @@ export default {
 
 
 <style>
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-
-tr:nth-child(even) {
-  background-color: #dddddd;
-}
+  .center {
+    margin: auto;
+    width: 20%;
+    padding: 10px;
+  }
 </style>
