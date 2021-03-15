@@ -6,7 +6,6 @@
         <i class="pi pi-search"/>
         <InputText v-on:keyup.enter="search" type="text" class="p-inputtext-lg" 
         style="width:600px;height:60px;border:solid;" v-model="search_value" placeholder="Search" />
-      <!-- border-block-color:red; -->
       </span>
       <p v-bind:class="search_value.length > 0 && search_value.length < 4? 'minimum-search' : 'no-display'">You must enter minimum 4 alphabets to search.</p>
     </div>
@@ -18,9 +17,13 @@
     <br>
 
     <div class="navigation-row">
-      <button v-on:click="search('previous')" class="pi pi-chevron-left navigation-column" style="fontSize: 3rem"></button>
-      <i>Results: {{MedicineList.count}} </i>
-      <button class="pi pi-chevron-right navigation-column" style="fontSize: 3rem"></button>
+      <button v-on:click="navigate_page('previous')"
+       v-bind:class="MedicineList.previous ? 'pi pi-chevron-left navigation-column' : 'no-display'"
+       style="fontSize: 3rem"></button>
+      <i style="letter-spacing:5px;">Results: {{MedicineList.count}}</i>
+      <button v-on:click="navigate_page('next')"
+      v-bind:class="MedicineList.next ? 'pi pi-chevron-right navigation-column' : 'no-display'"
+      style="fontSize: 3rem"></button>
 
     </div>
 
@@ -42,24 +45,22 @@ export default {
     const SERVER_BASE = 'http://localhost:8080/api';
     const MedicineList = ref([]);
     const search_value = ref("");
-
-    // let nextUrl = null
-    // let previousUrl = null
-    // let count = 0
+    let root_url = `${SERVER_BASE}/medicines/`;
 
     let columns = [
       {field: "id", header: "SN"},
       {field: "brand_name", header: "Brand"},
       {field: "generic_name", header: "Generic Name"},
       {field: "strength", header: "Strength"},
-      {field: "price", header: "Price"},
+      {field: "price", header: "Price (BDT)"},
       {field: "manufacturer", header: "Manufacturer"},
       {field: "dosages", header: "Dosages"},
       {field: "use_for", header: "Use for"},
     ]
 
-    async function getMedicineList(parameter="") {      
-      const response = await fetch(`${SERVER_BASE}/medicines/${parameter}`, {
+    async function getMedicineList(url) {      
+      const response = await fetch(url, {
+      // const response = await fetch(`${SERVER_BASE}/medicines/${parameter}`, {
       headers : { 
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -71,13 +72,17 @@ export default {
 
     function search(){
       if (search_value.value.length > 3){
-        getMedicineList(`?search=${search_value.value}`)
+        getMedicineList(`${root_url}?search=${search_value.value}`)
       }
     }
 
-    // function navigate_page(value){
-
-    // }
+    function navigate_page(value){
+      if (value == 'next'){
+        getMedicineList(MedicineList.value.next)
+      }
+      else
+        getMedicineList(MedicineList.value.previous)
+    }
 
     // watch(search_value, (newValue, oldValue) => {
     //   console.log(search_value)
@@ -89,12 +94,13 @@ export default {
 
     // add a watch mehtod to check search input length
 
-    getMedicineList();
+    getMedicineList(root_url);
     return {
       search,
       MedicineList,
       columns,
       search_value,
+      navigate_page,
     }
   }
 }
@@ -116,10 +122,14 @@ export default {
     display: table;
     align-items: center;
     margin: auto;
+    display: flex;
+    justify-content: center;
   }
 
   .navigation-column {
   padding: 5px;
+  display: flex;
+  justify-content: center;
   }
 
   .minimum-search{
