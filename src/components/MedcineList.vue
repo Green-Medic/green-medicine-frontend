@@ -4,13 +4,31 @@
     <div class="center">
       <span class="p-input-icon-right">
         <i class="pi pi-search"/>
-        <InputText v-on:keyup.enter="getMedicineList" type="text" class="p-inputtext-lg" v-model="search_value" placeholder="Search" />
+        <InputText v-on:keyup.enter="search" type="text" class="p-inputtext-lg" 
+        style="width:600px;height:60px;border:solid;" v-model="search_value" placeholder="Search" />
+      <!-- border-block-color:red; -->
       </span>
+      <p v-bind:class="search_value.length > 0 && search_value.length < 4? 'minimum-search' : 'no-display'">You must enter minimum 4 alphabets to search.</p>
     </div>
 
-    <DataTable :value="MedicineList">
+    <DataTable :value="MedicineList.results">
       <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field"></Column>
     </DataTable>
+
+    <br>
+
+    <div class="navigation-row">
+      <button v-on:click="search('previous')" class="pi pi-chevron-left navigation-column" style="fontSize: 3rem"></button>
+      <i>Results: {{MedicineList.count}} </i>
+      <button class="pi pi-chevron-right navigation-column" style="fontSize: 3rem"></button>
+
+    </div>
+
+    <br>
+    <br>
+    <br>
+    <br>
+
   </div>
 </template>
 
@@ -21,35 +39,59 @@ import { ref } from 'vue';
 export default {
   name: 'MedicineList',
   setup() {
-    const SERVER_BASE = 'https://api.mocki.io/v1';
+    const SERVER_BASE = 'http://localhost:8080/api';
     const MedicineList = ref([]);
     const search_value = ref("");
+
+    // let nextUrl = null
+    // let previousUrl = null
+    // let count = 0
+
     let columns = [
-      {field: "sl", header: "SN"},
+      {field: "id", header: "SN"},
       {field: "brand_name", header: "Brand"},
       {field: "generic_name", header: "Generic Name"},
       {field: "strength", header: "Strength"},
       {field: "price", header: "Price"},
       {field: "manufacturer", header: "Manufacturer"},
       {field: "dosages", header: "Dosages"},
-      {field: "dar", header: "DAR"},
       {field: "use_for", header: "Use for"},
     ]
 
-    async function getMedicineList(parameter="") {
-      parameter = search_value.value
-      const response = await fetch(`${SERVER_BASE}/738303ce/${parameter}`, {
+    async function getMedicineList(parameter="") {      
+      const response = await fetch(`${SERVER_BASE}/medicines/${parameter}`, {
       headers : { 
         'Content-Type': 'application/json',
         'Accept': 'application/json'
        }
       });
-      MedicineList.value = await response.json();
+      let jsonValue = await response.json();
+      MedicineList.value = jsonValue;
     }
+
+    function search(){
+      if (search_value.value.length > 3){
+        getMedicineList(`?search=${search_value.value}`)
+      }
+    }
+
+    // function navigate_page(value){
+
+    // }
+
+    // watch(search_value, (newValue, oldValue) => {
+    //   console.log(search_value)
+    //   console.log(newValue, oldValue)
+    //   // nextUrl = jsonValue.next
+    //   // previousUrl = jsonValue.previous
+    //   // count = jsonValue.count
+    // })
+
+    // add a watch mehtod to check search input length
 
     getMedicineList();
     return {
-      getMedicineList,
+      search,
       MedicineList,
       columns,
       search_value,
@@ -64,7 +106,29 @@ export default {
 <style>
   .center {
     margin: auto;
-    width: 30%;
-    padding: 20px;
+    width: 40%;
+    padding: 30px;
   }
+
+  .navigation-row {
+    content: "";
+    clear: both;
+    display: table;
+    align-items: center;
+    margin: auto;
+  }
+
+  .navigation-column {
+  padding: 5px;
+  }
+
+  .minimum-search{
+    text-align:center;
+    color:red;
+  }
+
+  .no-display{
+    display:none;
+  }
+
 </style>
