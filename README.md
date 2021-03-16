@@ -20,5 +20,7 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Run in production mood
+```
+docker build -t green . ; docker run -it -p 8000:80 --rm --name green-name green
+```
