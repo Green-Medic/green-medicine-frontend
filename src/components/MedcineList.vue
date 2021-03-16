@@ -7,7 +7,9 @@
         <InputText v-on:keyup.enter="search" type="text" class="p-inputtext-lg" 
         style="width:600px;height:60px;border:solid;" v-model="search_value" placeholder="Search" />
       </span>
-      <p v-bind:class="search_value.length > 0 && search_value.length < 3? 'minimum-search' : 'no-display'">You must enter minimum 4 alphabets to search.</p>
+      <p v-bind:class="search_value.length > 0 && search_value.length < 3? 'minimum-search' : 'no-display'">
+        You must enter minimum 3 alphabets to search.
+      </p>
     </div>
 
     <DataTable :value="MedicineList.results">
