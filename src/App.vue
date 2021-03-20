@@ -11,7 +11,7 @@ export default {
     const items = [
       { label: "Medicine List", icon: "pi pi-fw pi-home", to: "/" },
       {
-        label: "Covid Statistics",
+        label: "Covid Statistics(Bangladesh)",
         icon: "pi pi-fw pi-calendar",
         to: "/covid-stat",
       },

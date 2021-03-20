@@ -11,6 +11,9 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import TabMenu from 'primevue/tabmenu';
 import Chart from 'primevue/chart';
+import Message from 'primevue/message';
+import ToastService from 'primevue/toastservice';
+import Datepicker from 'vue3-datepicker'
 
 
 import "primevue/resources/themes/saga-blue/theme.css"; //theme
@@ -46,5 +49,8 @@ createApp(App)
   .component("Column", Column)
   .component("TabMenu", TabMenu)
   .component("Chart", Chart)
+  .component("Message", Message)
+  .component("ToastService", ToastService)
+  .component("Datepicker", Datepicker)
   .use(router)
   .mount("#app");

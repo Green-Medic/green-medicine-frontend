@@ -2,11 +2,44 @@
   <br />
   <br />
   <br />
+  <br />
+  <Message
+    class="p-col-12 p-md-3"
+    v-if="date_error"
+    :severity="error_severity.severity"
+    >You picked wrong Dates.</Message
+  >
+  <div class="center">
+
+
+    <div style="float:left;margin-right:40px;">
+      <datepicker
+        placeholder="From Date"
+        v-model="from_date"
+        :upper-limit="upper_limit"
+      />
+    </div>
+    <div style="float:left;margin-left:40px;">
+      <datepicker
+        placeholder="To Date"
+        v-model="to_date"
+        :upper-limit="upper_limit"
+      />
+    </div>
+  </div>
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
   <Chart type="horizontalBar" :data="plottingData" />
+  <br />
+  <br />
+  <br />
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 export default {
   name: "CovidStat",
@@ -15,14 +48,27 @@ export default {
 
     let covidData = ref([]);
     let plottingData = ref({});
+    let date_error = ref(false);
 
-    const toDate = moment().format("YYYY-MM-DD");
-    const fromDate = moment()
-      .subtract(10, "days")
-      .format("YYYY-MM-DD");
+    const from_date = ref(
+      moment()
+        .subtract(7, "days")
+        .toDate()
+    );
+    const to_date = ref(moment().toDate());
+    const upper_limit = ref(new Date());
+
+    // const toDate = ;
+    // const fromDate = ;
 
     // let url = `https://api.covid19api.com/total/country/bangladesh/status/${status[0]}?from=${fromDate}T00:00:00Z&to=${toDate}T00:00:00Z`;
-    let url = `https://api.covid19api.com/country/bangladesh?from=${fromDate}T00:00:00Z&to=${toDate}T00:00:00Z`;
+    let base_url = `https://api.covid19api.com/country/bangladesh?from=${moment(
+      from_date.value
+    )
+      .subtract(1, "days")
+      .format("YYYY-MM-DD")}T00:00:00Z&to=${moment(to_date.value).format(
+      "YYYY-MM-DD"
+    )}T00:00:00Z`;
 
     function processData(data) {
       let previous_confirmed = 0;
@@ -45,19 +91,12 @@ export default {
           recovered.push(data[i].Recovered - previous_recovered);
           active.push(data[i].Active);
           death.push(data[i].Deaths - previous_death);
-          console.log(data[i].Deaths, previous_death);
 
           previous_confirmed = data[i].Confirmed;
           previous_recovered = data[i].Recovered;
           previous_death = data[i].Deaths;
         }
       }
-      console.log({
-        confirmed: { dates: dates, cases: confirmed },
-        recovered: { dates: dates, cases: recovered },
-        active: { dates: dates, cases: active },
-        death: { dates: dates, cases: death },
-      });
       return {
         confirmed: { dates: dates, cases: confirmed },
         recovered: { dates: dates, cases: recovered },
@@ -66,7 +105,7 @@ export default {
       };
     }
 
-    async function getCovidData() {
+    async function getCovidData(url) {
       const response = await fetch(url, {
         headers: {
           "Content-Type": "application/json",
@@ -104,13 +143,46 @@ export default {
       };
     }
 
-    getCovidData();
+    watch([from_date, to_date], () => {
+      console.log(from_date, to_date);
+      // console.log(url)
+      // console.log(fromDate, toDate)
+      if (from_date.value > to_date.value) {
+        date_error.value = true;
+      } else {
+        getCovidData(
+          `https://api.covid19api.com/country/south-africa?from=${moment(
+            from_date.value
+          )
+            .subtract(1, "days")
+            .format("YYYY-MM-DD")}T00:00:00Z&to=${moment(to_date.value).format(
+            "YYYY-MM-DD"
+          )}T00:00:00Z`
+        );
+        date_error.value = false;
+      }
+      //   console.log(date_error.value);
+    });
+
+    getCovidData(base_url);
 
     return {
       plottingData,
+      from_date,
+      to_date,
+      upper_limit,
+      date_error,
+      error_severity: { severity: "error" },
     };
   },
 };
 </script>
 
-<style></style>
+<style>
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+</style>

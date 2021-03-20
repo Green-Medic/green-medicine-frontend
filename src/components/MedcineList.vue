@@ -1,5 +1,6 @@
 <template>
   <div>
+          <Message severity="success">Welcome to Green Medicine</Message>
     <div class="center">
       <span class="p-input-icon-right">
         <i class="pi pi-search" />
@@ -90,7 +91,7 @@ export default {
         // const response = await fetch(`${SERVER_BASE}/medicines/${parameter}`, {
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
         },
       });
       let jsonValue = await response.json();
